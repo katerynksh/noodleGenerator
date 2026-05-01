@@ -1,0 +1,28 @@
+{
+  "name": "noodlegenerator",
+  "version": "1.0.0",
+  "description": "Твій персональний адвокат у справах провалених дедлайнів та прогуляних пар. Професійно вішаю локшину на вуха викладачам, босам та колишнім. Вибирай режим (від Токсика до Філософа) та виходь сухим із води.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katerynksh/noodleGenerator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/katerynksh/noodleGenerator/issues"
+  },
+  "homepage": "https://github.com/katerynksh/noodleGenerator#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.4.2",
+    "groq-sdk": "^1.1.2",
+    "telegraf": "^4.16.3"
+  }
+}
