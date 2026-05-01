@@ -5,8 +5,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-// const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-// const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });  
 
 const userSessions = {};
 
@@ -17,14 +15,14 @@ const modes = {
   philosopher: "ти — екзистенційний філософ. Ти не даєш прямої відповіді, а розрозмірковуєш про марність буття, час та ентропію.",
   standart: "ти — звичайний генератор виправдань. Твої відповіді мають бути не абсурдними взагалі і абсолютно реальними, ніби ти просто пояснюєш ситуацію (наприклад, проспав, забув, попав під дощ, попав в аварію, вмер кіт).",
   teacher: "ти — строгий вчитель. Твої виправдання мають бути формальними, офіційними і максимально серйозними, ніби ти звітуєш перед директором школи (наприклад, через відсутність).",
-  adviser: "ти — радник з відповідей на повідомлення. Твоя задача допомогти людині нормально відповісти на наведене повідомлення (2-5 варіантів). Це мають бути реально хороші варіанти для відповіді)."
+  adviser: "ти — радник з відповідей на повідомлення. Твоя задача допомогти людині нормально відповісти на наведене повідомлення (2-5 варіантів). Це мають бути реально хороші варіанти для відповіді).",
+  ivanov: "ти — Олександ Іванов, куратор груп ІПЗс-25-1 та ІПЗс-25-2. На будь-яке запитання ти відповідаєш виключно одним смайликом: найчастіше або '🙂', або '🤝'. Жодних слів.`"
 };
 
 const modeKeyboard = Markup.keyboard([
-  ['🎓 Відмінник', '🐍 Токсик'],
-  ['🤡 67', '🌌 Філософ'],
-  ['🏫 Вчитель', '📊 Стандарт'],
-  ['👨‍💼 Радник відповідей']
+  ['🎓 Відмінник', '🐍 Токсик', '🤡 67'],
+  ['🌌 Філософ', '🏫 Вчитель', '📊 Стандарт'],
+  ['👨‍💼 Радник відповідей', '👨‍💼 Олександр Іванов']
 ]).resize();
 
 bot.start((ctx) => {
@@ -73,6 +71,7 @@ bot.on('location', (ctx) => {
 bot.on('poll', (ctx) => {
   ctx.reply('❌ Вибач, але я не вмію розрізняти опитування. Будь ласка, виберіть режим з меню нижче:', modeKeyboard);
 });
+
   
 
 bot.hears(['🎓 Відмінник', '🐍 Токсик', '🤡 67', '🌌 Філософ', '🏫 Вчитель', '📊 Стандарт'], (ctx) => {
@@ -83,6 +82,7 @@ bot.hears(['🎓 Відмінник', '🐍 Токсик', '🤡 67', '🌌 Фі
   if (text.includes('Філософ')) userSessions[ctx.from.id] = 'philosopher';
   if (text.includes('Вчитель')) userSessions[ctx.from.id] = 'teacher';
   if (text.includes('Стандарт')) userSessions[ctx.from.id] = 'standart';
+  if (text.includes('Олександр Іванов')) userSessions[ctx.from.id] = 'ivanov';
 
   ctx.reply(`✅ Режим активовано: ${text}\nТепер напиши мені питання для виправдання (наприклад: "чому не прийшов на пару?")`);
 });
@@ -91,35 +91,34 @@ bot.hears(['👨‍💼 Радник відповідей'], (ctx) => {
     if (text.includes('Радник відповідей')) userSessions[ctx.from.id] = 'adviser';
   ctx.reply(`✅ Режим активовано: ${text}\nТепер надішли мені повідомлення, на яке треба придумати відповідь (наприклад: "Привіт, як справи?")`);
 });
+bot.hears(['👨‍💼 Олександр Іванов'], (ctx) => {
+  const text = ctx.text;
+  if (text.includes('Олександр Іванов')) userSessions[ctx.from.id] = 'ivanov';
+  ctx.reply(`✅ Режим активовано: ${text}\nТи можеш задавати мені будь-які питання, адже я твій куратор і завжди готовий допомогти!🙂🤝`);
+});
 
 
 bot.on('text', async (ctx) => {
   const userId = ctx.from.id;
-  const currentMode = userSessions[userId] || 'cringe';
+  const currentMode = userSessions[userId] || 'standart';
   const userMessage = ctx.message.text;
 
-  try {
-    await ctx.sendChatAction('typing');
-  } catch (e) {
-    console.error("Помилка статусу друку:", e);
+  if (currentMode === 'ivanov') {
+    try {
+      const stickerSetName = 'olnxandr'; 
+      const stickerSet = await ctx.telegram.getStickerSet(stickerSetName);
+      
+      const randomIndex = Math.floor(Math.random() * stickerSet.stickers.length);
+      const randomSticker = stickerSet.stickers[randomIndex].file_id;
+
+      return await ctx.replyWithSticker(randomSticker);
+    } catch (error) {
+      console.error("Помилка стікерів:", error);
+      return ctx.reply("🙂");
+    }
   }
 
-  // try {
-  //   const prompt = `Ти — "Генератор Локшини", бот для вигадування виправдань на будь-яку тему або придумування відповіді на повідомлення іншої людини.
-  //   Твій стиль зараз: ${modes[currentMode]}.
-  //   Користувач задає тобі питання: "${userMessage}"
-  //   Відповідай правильною українською мовою, з правильним граматичними і синтаксичними формами.
-  //   Твоя відповідь має бути короткою (1-2 стислих речення), в режимі, який я вибрав.
-  //   Не використовуй вступні фрази "Ось твоє виправдання", не використовуй букви інших мов або зразу перекладай їх, просто пиши саму відповідь.
-  //   У режимі "Радник відповідей" дай 2-5 варіантів відповіді на наведене повідомлення, кожен варіант з нового рядка і пронумерований (тільки в режимі "Радник відповідей").`;
-    
-  //   const result = await model.generateContent(prompt)
-  //   const response = result.text || "Щось пішло не так, локшина злиплася.";
-  //   ctx.reply(response);
-  // } catch (error) {
-  //   console.error("Помилка Google Generative AI:", error);
-  //   ctx.reply("❌ Ой! ШІ перегрівся від такої нахабної брехні. Спробуй ще раз.");
-  // } 
+    await ctx.sendChatAction('typing');
   
 
   try {
@@ -134,7 +133,8 @@ bot.on('text', async (ctx) => {
           Твоя відповідь має бути короткою (1-2 стислих речення), в режимі, який я вибрав, не подавай виду що ти машина.  
           Не використовуй вступні фрази "Ось твоє виправдання", не використовуй букви інших мов або зразу перекладай їх, просто пиши саму відповідь.
           У всіх режимах, крім "Радник відповідей", дай одну відповідь.
-          У режимі "Радник відповідей" дай 2-5 варіантів відповіді на наведене повідомлення, кожен варіант з нового рядка і пронумерований (тільки в режимі "Радник відповідей").`
+          У режимі "Радник відповідей" дай 2-5 варіантів відповіді на наведене повідомлення, кожен варіант з нового рядка і пронумерований (тільки в режимі "Радник відповідей").
+          У режимі "Олександр Іванов" відповідай виключно стікерами, або смайликами "🙂" або "🤝".`
         },
         {
           role: "user",
@@ -155,16 +155,13 @@ bot.on('text', async (ctx) => {
   }
 });
 
-bot.launch().then(() => {
-  // console.log('🚀 Генератор Локшини успішно запущений!');
-});
+bot.launch();
 
-// М'яке завершення роботи
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
-import http from 'http';
-http.createServer((req, res) => {
-  res.write('Бот живий!');
-  res.end();
-}).listen(process.env.PORT || 3000);
+// import http from 'http';
+// http.createServer((req, res) => {
+//   res.write('Бот живий!');
+//   res.end();
+// }).listen(process.env.PORT || 3000);
