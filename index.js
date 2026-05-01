@@ -104,7 +104,7 @@ bot.on('text', async (ctx) => {
 
   if (currentMode === 'ivanov') {
     try {
-      const stickerSetName = 'olnxandr'; 
+      const stickerSetName = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADEATHAAAAAAAAAAAAAAAAAAA'; 
       const stickerSet = await ctx.telegram.getStickerSet(stickerSetName);
       
       const randomIndex = Math.floor(Math.random() * stickerSet.stickers.length);
