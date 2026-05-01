@@ -160,8 +160,8 @@ bot.launch();
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
-// import http from 'http';
-// http.createServer((req, res) => {
-//   res.write('Бот живий!');
-//   res.end();
-// }).listen(process.env.PORT || 3000);
+import http from 'http';
+http.createServer((req, res) => {
+  res.write('Бот живий!');
+  res.end();
+}).listen(process.env.PORT || 3000);
