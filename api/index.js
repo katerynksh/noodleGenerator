@@ -153,20 +153,21 @@ bot.on('text', async (ctx) => {
   }
 });
 
-// bot.launch();
+bot.launch();
+console.log("Бот успішно запущений");
 
-export default async (req, res) => {
-  try {
-    if (req.method === 'POST') {
-      await bot.handleUpdate(req.body, res);
-    } else {
-      res.status(200).send('Бот працює!');
-    }
-  } catch (err) {
-    console.error('Помилка Webhook:', err);
-    res.status(500).send('Internal Server Error');
-  }
-};
+// export default async (req, res) => {
+//   try {
+//     if (req.method === 'POST') {
+//       await bot.handleUpdate(req.body, res);
+//     } else {
+//       res.status(200).send('Бот працює!');
+//     }
+//   } catch (err) {
+//     console.error('Помилка Webhook:', err);
+//     res.status(500).send('Internal Server Error');
+//   }
+// };
 
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
