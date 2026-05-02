@@ -82,7 +82,6 @@ bot.hears(['🎓 Відмінник', '🐍 Токсик', '🤡 67', '🌌 Фі
   if (text.includes('Філософ')) userSessions[ctx.from.id] = 'philosopher';
   if (text.includes('Вчитель')) userSessions[ctx.from.id] = 'teacher';
   if (text.includes('Стандарт')) userSessions[ctx.from.id] = 'standart';
-
   ctx.reply(`✅ Режим активовано: ${text}\nТепер напиши мені питання для виправдання (наприклад: "чому не прийшов на пару?")`);
 });
 bot.hears(['👨‍💼 Радник відповідей'], (ctx) => {
@@ -154,7 +153,21 @@ bot.on('text', async (ctx) => {
   }
 });
 
-bot.launch();
+// bot.launch();
+
+module.exports = async (req, res) => {
+  try {
+    if (req.method === 'POST') {
+      await bot.handleUpdate(req.body, res);
+    } else {
+      res.status(200).send('Бот працює через Webhook!');
+    }
+  } catch (err) {
+    console.error('Помилка Webhook:', err);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
