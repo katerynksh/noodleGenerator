@@ -38,7 +38,7 @@
 
 ### 2. Встановлення
 ```bash
-git clone [https://github.com/katerynksh/noodleGenerator.git](https://github.com/katerynksh/noodleGenerator.git)
+git clone https://github.com/katerynksh/noodleGenerator.git
 cd noodleGenerator
 npm install
 ```
